@@ -1,0 +1,4 @@
+anthropic
+apscheduler
+pytz
+python-dotenv
