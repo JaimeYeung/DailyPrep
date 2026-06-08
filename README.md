@@ -50,7 +50,7 @@ python main.py
 - Daily priority email fires every weekday at 8:00 AM (America/Los_Angeles)
 - Brief check runs every 15 minutes; sends when a meeting is 45–75 min away
 
-### Manual triggers (for demo)
+### Manual triggers
 
 ```bash
 # Send daily priority email right now
@@ -62,54 +62,6 @@ python main.py --brief --meeting-id meeting_001
 # Force re-send even if brief was already sent
 python main.py --brief --meeting-id meeting_001 --force
 ```
-
----
-
-## Demo Script
-
-**Recommended order for a live presentation:**
-
-**1. Show the inbox first**
-> "This is what Sarah's inbox looked like this morning at 8 AM."
-
-Open the daily priority email. Walk through P0 → P1 → P2 → hygiene count line.
-
-**2. Show the pre-meeting brief**
-> "The KKR call is at 2 PM. This arrived automatically at 1 PM."
-
-```bash
-python main.py --brief --meeting-id meeting_001 --force
-```
-
-Switch to Gmail, show the brief. Walk through the five sections.
-
-**3. Live: modify one field, re-trigger**
-> "Let me show you how the priority engine actually works."
-
-Open `mock_data.py`. Change Blackstone's `customer_waiting` from `True` to `False`. Run:
-
-```bash
-python main.py --daily-now
-```
-
-Switch to Gmail. Blackstone is gone from P0. Change it back, re-run — it's back.
-
-> "Python decided that, not Claude. Every item traces to a specific field in the data."
-
-**4. Explain the production path**
-> "In production: swap mock_data.py for Salesforce API, deploy this app to Railway or Render,
-> use Zapier (already in your stack) to trigger the webhook at 8 AM and every 15 minutes.
-> Nothing runs on anyone's laptop."
-
----
-
-## Key Talking Points
-
-- **"Push not pull"** — reps don't open dashboards; emails arrive automatically
-- **"Python classifies, Claude writes"** — ranking is deterministic and explainable
-- **KKR demo** — three separate signals (customer waiting, commitment due today, meeting prep) merged into one P0 item with all three reason codes
-- **Citadel vs Apollo** — same weak-next-step signal, different stage, different tier — the rules, not Claude's judgment, make that distinction
-- **Production path** — Salesforce for data, Gong API for call summaries, Zapier for scheduling, Slack as alternate channel
 
 ---
 

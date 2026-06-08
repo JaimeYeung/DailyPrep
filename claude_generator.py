@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import anthropic
 from datetime import date, datetime
 from dotenv import load_dotenv
@@ -42,8 +43,9 @@ Generate a pre-meeting brief with exactly these seven sections in this order:
    Account, deal stage, attendees with their roles, ARR, days to close, account tier, industry.
 
 2. COMPANY SNAPSHOT
-   2-3 bullets from recent_news field. Then one line on current_solution: what the rep is displacing
-   and the key displacement angle (what pain does Hebbia solve that the current solution doesn't).
+   2-3 bullet points from recent_news field (one bullet per news item, start each with •).
+   Then one bullet on current_solution: what the rep is displacing and the key displacement angle.
+   Format every item as a standalone bullet — no paragraph prose.
 
 3. LAST CALL SUMMARY
    Summarize gong_summary in your own words — do not copy verbatim.
@@ -65,6 +67,7 @@ Generate a pre-meeting brief with exactly these seven sections in this order:
 
 7. WATCH OUT FOR
    3 bullets max: deal risks, missing stakeholders, timeline pressure.
+   Start each with •. One concise sentence per bullet — no paragraph prose.
 
 Every sentence must help the rep walk in more prepared.
 Use plain text with ━━━ section dividers. No markdown, no asterisks.
@@ -185,6 +188,14 @@ def generate_daily_email(classified: dict) -> str:
     return "\n".join(lines)
 
 
+def _normalize_brief(text: str) -> str:
+    # Collapse 3+ consecutive blank lines → 1 blank line
+    text = re.sub(r'\n{3,}', '\n\n', text)
+    # Collapse multiple consecutive ━━━ lines → one standard divider
+    text = re.sub(r'(━+\n)+', '━━━━━━━━━━━━━━━━━━━\n', text)
+    return text.strip()
+
+
 def generate_brief(meeting: dict, deal: dict) -> str:
     user_prompt = f"""Meeting in ~60 minutes:
 {json.dumps(meeting, indent=2)}
@@ -197,11 +208,11 @@ Generate the pre-meeting brief."""
     try:
         response = client.messages.create(
             model="claude-haiku-4-5-20251001",
-            max_tokens=1800,
+            max_tokens=4000,
             system=BRIEF_SYSTEM,
             messages=[{"role": "user", "content": user_prompt}]
         )
-        return response.content[0].text
+        return _normalize_brief(response.content[0].text)
     except Exception as e:
         return _fallback_brief(meeting, deal, str(e))
 
