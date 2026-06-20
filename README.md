@@ -1,4 +1,4 @@
-# Hebbia Sales Assistant — Daily Prep Automation
+#  Sales Assistant — Daily Prep Automation
 
 Automated push emails for sales reps. Two emails, zero manual effort:
 
